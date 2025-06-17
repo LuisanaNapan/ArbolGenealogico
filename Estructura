@@ -1,2 +1,214 @@
 #include <iostream>
-using namespace std
+#include <string>
+using namespace std;
+
+struct Nodo {
+    int id;
+    string nombre;
+    int nacimiento;
+    string fallecimiento;
+    Nodo* izq;
+    Nodo* der;
+    Nodo* padre;
+};
+
+Nodo* raiz = nullptr;
+
+// Crear nuevo nodo
+Nodo* crearNodo(int id, string nombre, int nacimiento, string fallecimiento) {
+    Nodo* nuevo = new Nodo;
+    nuevo->id = id;
+    nuevo->nombre = nombre;
+    nuevo->nacimiento = nacimiento;
+    nuevo->fallecimiento = fallecimiento;
+    nuevo->izq = nuevo->der = nuevo->padre = nullptr;
+    return nuevo;
+}
+
+// Insertar miembro
+void insertar(Nodo*& actual, Nodo* nuevo, Nodo* padre = nullptr) {
+    if (actual == nullptr) {
+        nuevo->padre = padre;
+        actual = nuevo;
+        cout << "Miembro insertado correctamente.\n";
+    } else if (nuevo->id < actual->id) {
+        insertar(actual->izq, nuevo, actual);
+    } else {
+        insertar(actual->der, nuevo, actual);
+    }
+}
+
+// Buscar miembro por ID
+Nodo* buscar(Nodo* actual, int id) {
+    if (actual == nullptr || actual->id == id) return actual;
+    return (id < actual->id) ? buscar(actual->izq, id) : buscar(actual->der, id);
+}
+
+// Mínimo del subárbol
+Nodo* minimo(Nodo* actual) {
+    while (actual && actual->izq != nullptr)
+        actual = actual->izq;
+    return actual;
+}
+
+// Eliminar nodo
+Nodo* eliminar(Nodo* raiz, int id) {
+    if (!raiz) return nullptr;
+    if (id < raiz->id) {
+        raiz->izq = eliminar(raiz->izq, id);
+    } else if (id > raiz->id) {
+        raiz->der = eliminar(raiz->der, id);
+    } else {
+        // Nodo encontrado
+        if (!raiz->izq) {
+            Nodo* temp = raiz->der;
+            delete raiz;
+            return temp;
+        } else if (!raiz->der) {
+            Nodo* temp = raiz->izq;
+            delete raiz;
+            return temp;
+        } else {
+            Nodo* sucesor = minimo(raiz->der);
+            raiz->id = sucesor->id;
+            raiz->nombre = sucesor->nombre;
+            raiz->nacimiento = sucesor->nacimiento;
+            raiz->fallecimiento = sucesor->fallecimiento;
+            raiz->der = eliminar(raiz->der, sucesor->id);
+        }
+    }
+    return raiz;
+}
+
+// Recorridos
+void inorden(Nodo* nodo) {
+    if (!nodo) return;
+    inorden(nodo->izq);
+    cout << nodo->nombre << " (" << nodo->id << ")\n";
+    inorden(nodo->der);
+}
+
+void preorden(Nodo* nodo) {
+    if (!nodo) return;
+    cout << nodo->nombre << " (" << nodo->id << ")\n";
+    preorden(nodo->izq);
+    preorden(nodo->der);
+}
+
+void postorden(Nodo* nodo) {
+    if (!nodo) return;
+    postorden(nodo->izq);
+    postorden(nodo->der);
+    cout << nodo->nombre << " (" << nodo->id << ")\n";
+}
+
+void porNivelesManual(Nodo* raiz) {
+    if (raiz == nullptr) return;
+
+    const int MAX = 100;
+    Nodo* cola[MAX];
+    int inicio = 0, fin = 0;
+
+    // Encolar raíz
+    cola[fin++] = raiz;
+
+    while (inicio < fin) {
+        Nodo* actual = cola[inicio++]; // Desencolar
+
+        cout << actual->nombre << " (" << actual->id << ")\n";
+
+        // Encolar hijos
+        if (actual->izq != nullptr) {
+            cola[fin++] = actual->izq;
+        }
+        if (actual->der != nullptr) {
+            cola[fin++] = actual->der;
+        }
+    }
+}
+
+// Ancestros
+void mostrarAncestros(Nodo* nodo) {
+    while (nodo) {
+        cout << nodo->nombre << " (" << nodo->id << ")\n";
+        nodo = nodo->padre;
+    }
+}
+
+// Descendientes (en preorden)
+void mostrarDescendientes(Nodo* nodo) {
+    if (!nodo) return;
+    cout << nodo->nombre << " (" << nodo->id << ")\n";
+    mostrarDescendientes(nodo->izq);
+    mostrarDescendientes(nodo->der);
+}
+
+// Menú principal
+int main() {
+    int opcion;
+    do {
+        cout << "\n---- MENU ÁRBOL GENEALÓGICO ----\n";
+        cout << "1. Insertar miembro\n";
+        cout << "2. Buscar miembro\n";
+        cout << "3. Eliminar miembro\n";
+        cout << "4. Consultar ancestros\n";
+        cout << "5. Consultar descendientes\n";
+        cout << "6. Recorridos\n";
+        cout << "7. Salir\n";
+        cout << "Seleccione una opción: ";
+        cin >> opcion;
+
+        if (opcion == 1) {
+            int id, nac;
+            string nombre, fallecido;
+            cout << "ID (DNI): "; cin >> id;
+            cin.ignore();
+            cout << "Nombre: "; getline(cin, nombre);
+            cout << "Año de nacimiento: "; cin >> nac;
+            cin.ignore();
+            cout << "Fallecimiento (o 'Vivo'): "; getline(cin, fallecido);
+            Nodo* nuevo = crearNodo(id, nombre, nac, fallecido);
+            insertar(raiz, nuevo);
+        } else if (opcion == 2) {
+            int id;
+            cout << "Ingrese ID a buscar: ";
+            cin >> id;
+            Nodo* resultado = buscar(raiz, id);
+            if (resultado)
+                cout << "Encontrado: " << resultado->nombre << " (" << resultado->id << ")\n";
+            else
+                cout << "No encontrado.\n";
+        } else if (opcion == 3) {
+            int id;
+            cout << "ID a eliminar: ";
+            cin >> id;
+            raiz = eliminar(raiz, id);
+            cout << "Eliminado si existía.\n";
+        } else if (opcion == 4) {
+            int id;
+            cout << "ID para ver ancestros: ";
+            cin >> id;
+            Nodo* n = buscar(raiz, id);
+            if (n) mostrarAncestros(n->padre);
+            else cout << "No encontrado.\n";
+        } else if (opcion == 5) {
+            int id;
+            cout << "ID para ver descendientes: ";
+            cin >> id;
+            Nodo* n = buscar(raiz, id);
+            if (n) mostrarDescendientes(n);
+            else cout << "No encontrado.\n";
+        } else if (opcion == 6) {
+            int tipo;
+            cout << "1. Inorden\n2. Preorden\n3. Postorden\n4. Por niveles\nOpción: ";
+            cin >> tipo;
+            if (tipo == 1) inorden(raiz);
+            else if (tipo == 2) preorden(raiz);
+            else if (tipo == 3) postorden(raiz);
+            else if (tipo == 4) porNiveles(raiz);
+        }
+    } while (opcion != 7);
+
+    cout << "Programa finalizado.\n";
+    return 0;
+}
