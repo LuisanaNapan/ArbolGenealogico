@@ -12,7 +12,7 @@ struct Nodo {
     Nodo* padre;
 };
 
-Nodo* raiz = nullptr;
+Nodo* raiz = NULL;
 
 // Crear nuevo nodo
 Nodo* crearNodo(int id, string nombre, int nacimiento, string fallecimiento) {
@@ -21,13 +21,13 @@ Nodo* crearNodo(int id, string nombre, int nacimiento, string fallecimiento) {
     nuevo->nombre = nombre;
     nuevo->nacimiento = nacimiento;
     nuevo->fallecimiento = fallecimiento;
-    nuevo->izq = nuevo->der = nuevo->padre = nullptr;
+    nuevo->izq = nuevo->der = nuevo->padre = NULL;
     return nuevo;
 }
 
 // Insertar miembro
-void insertar(Nodo*& actual, Nodo* nuevo, Nodo* padre = nullptr) {
-    if (actual == nullptr) {
+void insertar(Nodo*& actual, Nodo* nuevo, Nodo* padre = NULL) {
+    if (actual == NULL) {
         nuevo->padre = padre;
         actual = nuevo;
         cout << "Miembro insertado correctamente.\n";
@@ -40,20 +40,20 @@ void insertar(Nodo*& actual, Nodo* nuevo, Nodo* padre = nullptr) {
 
 // Buscar miembro por ID
 Nodo* buscar(Nodo* actual, int id) {
-    if (actual == nullptr || actual->id == id) return actual;
+    if (actual == NULL || actual->id == id) return actual;
     return (id < actual->id) ? buscar(actual->izq, id) : buscar(actual->der, id);
 }
 
 // Mínimo del subárbol
 Nodo* minimo(Nodo* actual) {
-    while (actual && actual->izq != nullptr)
+    while (actual && actual->izq != NULL)
         actual = actual->izq;
     return actual;
 }
 
 // Eliminar nodo
 Nodo* eliminar(Nodo* raiz, int id) {
-    if (!raiz) return nullptr;
+    if (!raiz) return NULL;
     if (id < raiz->id) {
         raiz->izq = eliminar(raiz->izq, id);
     } else if (id > raiz->id) {
@@ -102,8 +102,8 @@ void postorden(Nodo* nodo) {
     cout << nodo->nombre << " (" << nodo->id << ")\n";
 }
 
-void porNivelesManual(Nodo* raiz) {
-    if (raiz == nullptr) return;
+void porNiveles(Nodo* raiz) {
+    if (raiz == NULL) return;
 
     const int MAX = 100;
     Nodo* cola[MAX];
@@ -118,10 +118,10 @@ void porNivelesManual(Nodo* raiz) {
         cout << actual->nombre << " (" << actual->id << ")\n";
 
         // Encolar hijos
-        if (actual->izq != nullptr) {
+        if (actual->izq != NULL) {
             cola[fin++] = actual->izq;
         }
-        if (actual->der != nullptr) {
+        if (actual->der != NULL) {
             cola[fin++] = actual->der;
         }
     }
@@ -211,4 +211,4 @@ int main() {
 
     cout << "Programa finalizado.\n";
     return 0;
-}
+} 
