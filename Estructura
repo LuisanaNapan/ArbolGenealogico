@@ -145,7 +145,7 @@ void mostrarDescendientes(Nodo* nodo) {
 
 // Menú principal
 int main() {
-setlocale(LC_CTYPE,"Spanish");
+    setlocale(LC_CTYPE, "Spanish");
     int opcion;
     do {
         cout << "\n---- MENU ÁRBOL GENEALÓGICO ----\n";
@@ -159,57 +159,86 @@ setlocale(LC_CTYPE,"Spanish");
         cout << "Seleccione una opción: ";
         cin >> opcion;
 
-        if (opcion == 1) {
-            int id, nac;
-            string nombre, fallecido;
-            cout << "ID (DNI): "; cin >> id;
-            cin.ignore();
-            cout << "Nombre: "; getline(cin, nombre);
-            cout << "Año de nacimiento: "; cin >> nac;
-            cin.ignore();
-            cout << "Fallecimiento (o 'Vivo'): "; getline(cin, fallecido);
-            Nodo* nuevo = crearNodo(id, nombre, nac, fallecido);
-            insertar(raiz, nuevo);
-        } else if (opcion == 2) {
-            int id;
-            cout << "Ingrese ID a buscar: ";
-            cin >> id;
-            Nodo* resultado = buscar(raiz, id);
-            if (resultado)
-                cout << "Encontrado: " << resultado->nombre << " (" << resultado->id << ")\n";
-            else
-                cout << "No encontrado.\n";
-        } else if (opcion == 3) {
-            int id;
-            cout << "ID a eliminar: ";
-            cin >> id;
-            raiz = eliminar(raiz, id);
-            cout << "Eliminado si existía.\n";
-        } else if (opcion == 4) {
-            int id;
-            cout << "ID para ver ancestros: ";
-            cin >> id;
-            Nodo* n = buscar(raiz, id);
-            if (n) mostrarAncestros(n->padre);
-            else cout << "No encontrado.\n";
-        } else if (opcion == 5) {
-            int id;
-            cout << "ID para ver descendientes: ";
-            cin >> id;
-            Nodo* n = buscar(raiz, id);
-            if (n) mostrarDescendientes(n);
-            else cout << "No encontrado.\n";
-        } else if (opcion == 6) {
-            int tipo;
-            cout << "1. Inorden\n2. Preorden\n3. Postorden\n4. Por niveles\nOpción: ";
-            cin >> tipo;
-            if (tipo == 1) inorden(raiz);
-            else if (tipo == 2) preorden(raiz);
-            else if (tipo == 3) postorden(raiz);
-            else if (tipo == 4) porNiveles(raiz);
+        switch (opcion) {
+            case 1: {
+                int id, nac;
+                string nombre, fallecido;
+                cout << "ID (DNI): "; cin >> id;
+                cin.ignore();
+                cout << "Nombre: "; getline(cin, nombre);
+                cout << "Año de nacimiento: "; cin >> nac;
+                cin.ignore();
+                cout << "Fallecimiento (o 'Vivo'): "; getline(cin, fallecido);
+                Nodo* nuevo = crearNodo(id, nombre, nac, fallecido);
+                insertar(raiz, nuevo);
+                break;
+            }
+
+            case 2: {
+                int id;
+                cout << "Ingrese ID a buscar: ";
+                cin >> id;
+                Nodo* resultado = buscar(raiz, id);
+                if (resultado)
+                    cout << "Encontrado: " << resultado->nombre << " (" << resultado->id << ")\n";
+                else
+                    cout << "No encontrado.\n";
+                break;
+            }
+
+            case 3: {
+                int id;
+                cout << "ID a eliminar: ";
+                cin >> id;
+                raiz = eliminar(raiz, id);
+                cout << "Eliminado si existía.\n";
+                break;
+            }
+
+            case 4: {
+                int id;
+                cout << "ID para ver ancestros: ";
+                cin >> id;
+                Nodo* n = buscar(raiz, id);
+                if (n) mostrarAncestros(n->padre);
+                else cout << "No encontrado.\n";
+                break;
+            }
+
+            case 5: {
+                int id;
+                cout << "ID para ver descendientes: ";
+                cin >> id;
+                Nodo* n = buscar(raiz, id);
+                if (n) mostrarDescendientes(n);
+                else cout << "No encontrado.\n";
+                break;
+            }
+
+            case 6: {
+                int tipo;
+                cout << "1. Inorden\n2. Preorden\n3. Postorden\n4. Por niveles\nOpción: ";
+                cin >> tipo;
+                switch (tipo) {
+                    case 1: inorden(raiz); break;
+                    case 2: preorden(raiz); break;
+                    case 3: postorden(raiz); break;
+                    case 4: porNiveles(raiz); break;
+                    default: cout << "Opción no válida.\n"; break;
+                }
+                break;
+            }
+
+            case 7:
+                cout << "Programa finalizado.\n";
+                break;
+
+            default:
+                cout << "Opción inválida. Intente de nuevo.\n";
+                break;
         }
+
     } while (opcion != 7);
 
-    cout << "Programa finalizado.\n";
     return 0;
-} 
+}
