@@ -145,6 +145,7 @@ void mostrarDescendientes(Nodo* nodo) {
 
 // Menú principal
 int main() {
+setlocale(LC_CTYPE,"Spanish");
     int opcion;
     do {
         cout << "\n---- MENU ÁRBOL GENEALÓGICO ----\n";
