@@ -25,36 +25,22 @@ Nodo* crearNodo(int id, string nombre, int nacimiento, string fallecimiento) {
     return nuevo;
 }
 
+// Buscar miembro por ID
+Nodo* buscar(Nodo* actual, int id) {
+    if (actual == NULL || actual->id == id) return actual;
+    return (id < actual->id) ? buscar(actual->izq, id) : buscar(actual->der, id);
+}
+
 // Insertar miembro
-void insertarFlexible(Nodo*& raiz, Nodo* nuevo) { //NO CAMBIAR - DAYANA
-    if (!raiz) {
-        raiz = nuevo;
-        cout << "Primer miembro insertado como raíz.\n";
-        return;
-    }
-
-    int idRelacionado;
-    cout << "Ingrese el ID del familiar relacionado: ";
-    cin >> idRelacionado;
-    Nodo* relativo = buscar(raiz, idRelacionado);
-
-    if (!relativo) {
-        cout << "Miembro no encontrado.\n";
-        return;
-    }
-
-    cout << "¿Qué relación tiene con " << relativo->nombre << "?\n";
-    cout << "1. Padre/Madre\n";
-    cout << "2. Hijo/a izquierdo/a\n";
-    cout << "3. Hijo/a derecho/a\n";
-    cout << "4. Hermano/a izquierdo/a\n";
-    cout << "5. Hermano/a derecho/a\n";
-    cout << "Opción: ";
-    int relacion;
-    cin >> relacion;
+void insertarFlexible(Nodo*& raiz, Nodo* nuevo, int generacionesMax, int idRelacionado, int relacion) { //NO CAMBIAR - DAYANA
+	Nodo* relativo = buscar(raiz, idRelacionado);
+	if (!relativo) {
+	    cout << "Miembro no encontrado.\n";
+	    return;
+	}
 
     switch (relacion) {
-        case 1:
+		case 1:
             if (relativo == raiz) {
                 nuevo->izq = raiz;
                 raiz->padre = nuevo;
@@ -85,33 +71,37 @@ void insertarFlexible(Nodo*& raiz, Nodo* nuevo) { //NO CAMBIAR - DAYANA
                 cout << "Asignado como hijo derecho.\n";
             } else cout << "Ya tiene hijo derecho.\n";
             break;
-        case 4:
-        case 5:
-            if (!relativo->padre) {
-                cout << "No tiene padre registrado, no se puede agregar hermano.\n";
-                break;
-            }
-            if (relacion == 4 && (!relativo->padre->izq || relativo->padre->izq == relativo)) {
-                relativo->padre->izq = nuevo;
-                nuevo->padre = relativo->padre;
-                cout << "Asignado como hermano izquierdo.\n";
-            } else if (relacion == 5 && (!relativo->padre->der || relativo->padre->der == relativo)) {
-                relativo->padre->der = nuevo;
-                nuevo->padre = relativo->padre;
-                cout << "Asignado como hermano derecho.\n";
-            } else {
-                cout << "Ya existe un hijo en esa posición.\n";
-            }
-            break;
+		case 4:
+		    if (!relativo->padre) {
+		        cout << "No tiene padre registrado, no se puede agregar hermano.\n";
+		        break;
+		    }
+		    if (relativo->padre->izq == NULL) {
+		        relativo->padre->izq = nuevo;
+		        nuevo->padre = relativo->padre;
+		        cout << "Asignado como hermano izquierdo.\n";
+		    } else {
+		        cout << "Ya existe un hijo izquierdo, no se puede agregar como hermano.\n";
+		    }
+		    break;
+		
+		case 5:
+		    if (!relativo->padre) {
+		        cout << "No tiene padre registrado, no se puede agregar hermano.\n";
+		        break;
+		    }
+		    if (relativo->padre->der == NULL) {
+		        relativo->padre->der = nuevo;
+		        nuevo->padre = relativo->padre;
+		        cout << "Asignado como hermano derecho.\n";
+		    } else {
+		        cout << "Ya existe un hijo derecho, no se puede agregar como hermano.\n";
+		    }
+		    break;
+
         default:
             cout << "Relación no válida.\n";
     }
-}
-
-// Buscar miembro por ID
-Nodo* buscar(Nodo* actual, int id) {
-    if (actual == NULL || actual->id == id) return actual;
-    return (id < actual->id) ? buscar(actual->izq, id) : buscar(actual->der, id);
 }
 
 // Mínimo del subárbol
@@ -213,12 +203,29 @@ void mostrarDescendientes(Nodo* nodo) {
     mostrarDescendientes(nodo->der);
 }
 
+int calcularNivel(Nodo* nodo) {
+    int nivel = 1;
+    while (nodo->padre != NULL) {
+        nivel++;
+        nodo = nodo->padre;
+    }
+    return nivel;
+}
+
+int calcularProfundidad(Nodo* nodo, int nivel) {
+    if (nodo == NULL) return nivel - 1;
+    int izq = calcularProfundidad(nodo->izq, nivel + 1);
+    int der = calcularProfundidad(nodo->der, nivel + 1);
+    return (izq > der) ? izq : der;
+}
+
 // Menú principal
 int main() {
-	int generaciones; //NO CAMBIAR - DAYANA
-    cout << "Ingrese cuántos miembros desea agregar al árbol genealógico: ";
-    cin >> generaciones;
-    
+    setlocale(LC_CTYPE, "Spanish");
+    int generaciones;
+	cout << "Ingrese cuántas generaciones máximas tendrá el árbol genealógico: ";
+	cin >> generaciones;
+
     int opcion;
     do {
         cout << "\n---- MENU ÁRBOL GENEALÓGICO ----\n";
@@ -233,23 +240,63 @@ int main() {
         cin >> opcion;
 
         switch (opcion) {
-            case 1: { //NO CAMBIAR - DAYANA
-                if (ii < generaciones) {
-                    int id, nac;
-                    string nombre, fallecido;
-                    cout << "ID (DNI): "; cin >> id;
-                    cin.ignore();
-                    cout << "Nombre: "; getline(cin, nombre);
-                    cout << "Año de nacimiento: "; cin >> nac;
-                    cin.ignore();
-                    cout << "Fallecimiento (o 'Vivo'): "; getline(cin, fallecido);
-                    Nodo* nuevo = crearNodo(id, nombre, nac, fallecido);
-                    insertarFlexible(raiz, nuevo);
-                    ii++;
-                } else {
-                    cout << "Ya ingresó el número máximo de miembros.\n";
-                }
-            break;
+			case 1: {
+			    if (!raiz) {
+			        int id, nac;
+			        string nombre, fallecido;
+			
+			        cout << "ID (DNI): "; cin >> id;
+			        cout << "Nombre: "; cin >> nombre;
+			        cout << "Año de nacimiento: "; cin >> nac;
+			        cout << "Fallecimiento (o 'Vivo'): "; cin >> fallecido;
+			
+			        Nodo* nuevo = crearNodo(id, nombre, nac, fallecido);
+			        raiz = nuevo;
+			        cout << "Primer miembro insertado como raíz.\n";
+			    } else {
+			        int idRelacionado, relacion;
+			
+			        cout << "Ingrese el ID del familiar relacionado: ";
+			        cin >> idRelacionado;
+			
+			        Nodo* relativo = buscar(raiz, idRelacionado);
+			        if (!relativo) {
+			            cout << "Miembro no encontrado.\n";
+			            break;
+			        }
+			
+			        cout << "¿Qué relación tiene con " << relativo->nombre << "?\n";
+			        cout << "1. Padre/Madre\n";
+			        cout << "2. Hijo/a izquierdo/a\n";
+			        cout << "3. Hijo/a derecho/a\n";
+			        cout << "4. Hermano/a izquierdo/a\n";
+			        cout << "5. Hermano/a derecho/a\n";
+			        cout << "Opción: ";
+			        cin >> relacion;
+			
+			        // Verifica si excede generaciones antes de pedir datos
+					int nivelActual = calcularNivel(relativo);
+					if ((relacion == 1 && nivelActual >= generaciones) || // Insertar padre sube una generación
+					    ((relacion == 2 || relacion == 3) && nivelActual + 1 > generaciones) || // Insertar hijo sí sube
+					    ((relacion == 4 || relacion == 5) && nivelActual > generaciones)) { // Hermano está al mismo nivel
+					    cout << "No se puede insertar: excede las generaciones permitidas.\n";
+					    break;
+					}
+			
+			        // Ahora sí pide los datos del nuevo miembro
+			        int id, nac;
+			        string nombre, fallecido;
+			
+			        cout << "ID (DNI): "; cin >> id;
+			        cout << "Nombre: "; cin >> nombre;
+			        cout << "Año de nacimiento: "; cin >> nac;
+			        cout << "Fallecimiento (o 'Vivo'): "; cin >> fallecido;
+			
+			        Nodo* nuevo = crearNodo(id, nombre, nac, fallecido);
+			        insertarFlexible(raiz, nuevo, generaciones, idRelacionado, relacion);
+			    }
+			    break;
+			}
 
             case 2: {
                 int id;
