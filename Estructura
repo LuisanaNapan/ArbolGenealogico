@@ -111,34 +111,50 @@ Nodo* minimo(Nodo* actual) {
     return actual;
 }
 
-// Eliminar nodo
-Nodo* eliminar(Nodo* raiz, int id) {
-    if (!raiz) return NULL;
-    if (id < raiz->id) {
-        raiz->izq = eliminar(raiz->izq, id);
-    } else if (id > raiz->id) {
-        raiz->der = eliminar(raiz->der, id);
+void eliminarMiembroGenealogico(Nodo*& raiz, int id) {
+    Nodo* actual = buscar(raiz, id); // 1. Buscar al miembro a eliminar por su ID
+    if (!actual) {
+        cout << "Miembro no encontrado.\n"; // 2. Si no lo encuentra, muestra mensaje
+        return;
+    }
+
+    Nodo* padre = actual->padre; // 3. Guardamos al padre del nodo a eliminar (si tiene)
+
+    // 4. Si tiene un padre (NO es la raíz)
+    if (padre) {
+        if (padre->izq == actual) { // 5. ¿Es hijo izquierdo?
+            // 6. Asignamos el hijo izquierdo del eliminado como nuevo hijo del padre
+            padre->izq = actual->izq ? actual->izq : actual->der;
+            if (padre->izq) padre->izq->padre = padre;
+        } else if (padre->der == actual) { // 7. ¿Es hijo derecho?
+            padre->der = actual->izq ? actual->izq : actual->der;
+            if (padre->der) padre->der->padre = padre;
+        }
+
     } else {
-        // Nodo encontrado
-        if (!raiz->izq) {
-            Nodo* temp = raiz->der;
-            delete raiz;
-            return temp;
-        } else if (!raiz->der) {
-            Nodo* temp = raiz->izq;
-            delete raiz;
-            return temp;
+        // 8. Si el nodo a eliminar es la raíz (NO tiene padre)
+        if (actual->izq) {
+            raiz = actual->izq;         // 9. Su hijo izquierdo será la nueva raíz
+            raiz->padre = NULL;
+
+            // 10. Si también hay hijo derecho, lo colocamos como descendiente
+            Nodo* temp = raiz;
+            while (temp->der) temp = temp->der;  // 11. Buscamos la posición más a la derecha
+            temp->der = actual->der;             // 12. Lo colocamos allí
+            if (actual->der) actual->der->padre = temp;
+
+        } else if (actual->der) {
+            raiz = actual->der;  // 13. Si no tiene hijo izquierdo, el derecho será la raíz
+            raiz->padre = NULL;
         } else {
-            Nodo* sucesor = minimo(raiz->der);
-            raiz->id = sucesor->id;
-            raiz->nombre = sucesor->nombre;
-            raiz->nacimiento = sucesor->nacimiento;
-            raiz->fallecimiento = sucesor->fallecimiento;
-            raiz->der = eliminar(raiz->der, sucesor->id);
+            raiz = NULL;  // 14. Si no tiene hijos, el árbol queda vacío
         }
     }
-    return raiz;
+
+    delete actual;  // 15. Finalmente, eliminamos el nodo
+    cout << "Miembro eliminado correctamente (con reorganización).\n";
 }
+
 
 // Recorridos
 void inorden(Nodo* nodo) {
@@ -311,13 +327,13 @@ int main() {
             }
 
             case 3: {
-                int id;
-                cout << "ID a eliminar: ";
-                cin >> id;
-                raiz = eliminar(raiz, id);
-                cout << "Eliminado si existía.\n";
-                break;
-            }
+		int id;
+		cout << "ID a eliminar (por fallecimiento): ";
+		cin >> id;
+		eliminarMiembroGenealogico(raiz, id);
+	        break;
+	    }
+
 
             case 4: {
                 int id;
