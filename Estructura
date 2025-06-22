@@ -244,15 +244,15 @@ int main() {
 
     int opcion;
     do {
-        cout << "\n---- MENU ÁRBOL GENEALÓGICO ----\n";
-        cout << "1. Insertar miembro\n";
-        cout << "2. Buscar miembro\n";
-        cout << "3. Eliminar miembro\n";
-        cout << "4. Consultar ancestros\n";
-        cout << "5. Consultar descendientes\n";
-        cout << "6. Recorridos\n";
-        cout << "7. Salir\n";
-        cout << "Seleccione una opción: ";
+        cout << "\n\t---- MENU ÁRBOL GENEALÓGICO ----\n";
+        cout << "\t[1]. Insertar miembro\n";
+        cout << "\t[2]. Buscar miembro\n";
+        cout << "\t[3]. Eliminar miembro\n";
+        cout << "\t[4]. Consultar ancestros\n";
+        cout << "\t[5]. Consultar descendientes\n";
+        cout << "\t[6]. Recorridos\n";
+        cout << "\t[7]. Salir\n";
+        cout << "\tSeleccione una opción: ";
         cin >> opcion;
 
         switch (opcion) {
@@ -261,32 +261,32 @@ int main() {
 			        int id, nac;
 			        string nombre, fallecido;
 			
-			        cout << "ID (DNI): "; cin >> id;
-			        cout << "Nombre: "; cin >> nombre;
-			        cout << "Año de nacimiento: "; cin >> nac;
-			        cout << "Fallecimiento (o 'Vivo'): "; cin >> fallecido;
+			        cout << "\tID (DNI): "; cin >> id;
+			        cout << "\tNombre: "; cin >> nombre;
+			        cout << "\tAño de nacimiento: "; cin >> nac;
+			        cout << "\tFallecimiento (o 'Vivo'): "; cin >> fallecido;
 			
 			        Nodo* nuevo = crearNodo(id, nombre, nac, fallecido);
 			        raiz = nuevo;
-			        cout << "Primer miembro insertado como raíz.\n";
+			        cout << "\tPrimer miembro insertado como raíz.\n";
 			    } else {
 			        int idRelacionado, relacion;
 			
-			        cout << "Ingrese el ID del familiar relacionado: ";
+			        cout << "\tIngrese el ID del familiar relacionado: ";
 			        cin >> idRelacionado;
 			
 			        Nodo* relativo = buscar(raiz, idRelacionado);
 			        if (!relativo) {
-			            cout << "Miembro no encontrado.\n";
+			            cout << "\tMiembro no encontrado.\n";
 			            break;
 			        }
 			
-			        cout << "¿Qué relación tiene con " << relativo->nombre << "?\n";
-			        cout << "1. Padre/Madre\n";
-			        cout << "2. Hijo/a izquierdo/a\n";
-			        cout << "3. Hijo/a derecho/a\n";
-			        cout << "4. Hermano/a izquierdo/a\n";
-			        cout << "5. Hermano/a derecho/a\n";
+			        cout << "\n\t¿Qué relación tiene con " << relativo->nombre << "?\n";
+			        cout << "\n\t1. Padre/Madre\n";
+			        cout << "\t2. Hijo/a izquierdo/a\n";
+			        cout << "\t3. Hijo/a derecho/a\n";
+			        cout << "\t4. Hermano/a izquierdo/a\n";
+			        cout << "\t5. Hermano/a derecho/a\n";
 			        cout << "Opción: ";
 			        cin >> relacion;
 			
@@ -303,10 +303,10 @@ int main() {
 			        int id, nac;
 			        string nombre, fallecido;
 			
-			        cout << "ID (DNI): "; cin >> id;
-			        cout << "Nombre: "; cin >> nombre;
-			        cout << "Año de nacimiento: "; cin >> nac;
-			        cout << "Fallecimiento (o 'Vivo'): "; cin >> fallecido;
+			        cout << "\tID (DNI): "; cin >> id;
+			        cout << "\tNombre: "; cin >> nombre;
+			        cout << "\tAño de nacimiento: "; cin >> nac;
+			        cout << "\tFallecimiento (o 'Vivo'): "; cin >> fallecido;
 			
 			        Nodo* nuevo = crearNodo(id, nombre, nac, fallecido);
 			        insertarFlexible(raiz, nuevo, generaciones, idRelacionado, relacion);
@@ -316,19 +316,19 @@ int main() {
 
             case 2: {
                 int id;
-                cout << "Ingrese ID a buscar: ";
+                cout << "\tIngrese ID a buscar: ";
                 cin >> id;
                 Nodo* resultado = buscar(raiz, id);
                 if (resultado)
-                    cout << "Encontrado: " << resultado->nombre << " (" << resultado->id << ")\n";
+                    cout << "\tEncontrado: " << resultado->nombre << " (" << resultado->id << ")\n";
                 else
-                    cout << "No encontrado.\n";
+                    cout << "\tNo encontrado.\n";
                 break;
             }
 
             case 3: {
 		int id;
-		cout << "ID a eliminar (por fallecimiento): ";
+		cout << "\tID a eliminar (por fallecimiento): ";
 		cin >> id;
 		eliminarMiembroGenealogico(raiz, id);
 	        break;
@@ -337,7 +337,7 @@ int main() {
 
             case 4: {
                 int id;
-                cout << "ID para ver ancestros: ";
+                cout << "\tID para ver ancestros: ";
                 cin >> id;
                 Nodo* n = buscar(raiz, id);
                 if (n) mostrarAncestros(n->padre);
@@ -347,7 +347,7 @@ int main() {
 
             case 5: {
                 int id;
-                cout << "ID para ver descendientes: ";
+                cout << "\tID para ver descendientes: ";
                 cin >> id;
                 Nodo* n = buscar(raiz, id);
                 if (n) mostrarDescendientes(n);
@@ -357,7 +357,7 @@ int main() {
 
             case 6: {
                 int tipo;
-                cout << "1. Inorden\n2. Preorden\n3. Postorden\n4. Por niveles\nOpción: ";
+                cout << "\t1. Inorden\n2. Preorden\n3. Postorden\n4. Por niveles\nOpción: ";
                 cin >> tipo;
                 switch (tipo) {
                     case 1: inorden(raiz); break;
@@ -370,11 +370,11 @@ int main() {
             }
 
             case 7:
-                cout << "Programa finalizado.\n";
+                cout << "\tPrograma finalizado.\n";
                 break;
 
             default:
-                cout << "Opción inválida. Intente de nuevo.\n";
+                cout << "\tOpción inválida. Intente de nuevo.\n";
                 break;
         }
 
