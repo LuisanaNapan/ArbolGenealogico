@@ -158,7 +158,7 @@ void eliminarMiembroGenealogico(Nodo*& raiz, int id) {
 //imprimir recorrido con datos completos
 void imprimirFicha(Nodo* nodo, const string& tipo) {
     cout << "\t----------------------------------\n";
-    cout << "\tTipo        : " << tipo << "\n";
+    cout << "\tTipo      : " << tipo << "\n";
     cout << "\tNombre    : " << nodo->nombre << "\n";
     cout << "\tID (DNI)  : " << nodo->id << "\n";
     cout << "\tNacimiento: " << nodo->nacimiento << "\n";
@@ -287,14 +287,14 @@ bool validaranio(Nodo* nuevo, Nodo* relativo, int relacion){
 int main() {
     setlocale(LC_CTYPE, "Spanish");
     int generaciones;
-	cout << "Ingrese cuántas generaciones máximas tendrá el árbol genealógico: ";
+	cout << "\n\tIngrese cuántas generaciones máximas tendrá el árbol genealógico: ";
 	cin >> generaciones;
 
     int opcion;
     do {
 	cout << "\n\t----------------------------------\n";
         cout << "\t|---- MENU ÁRBOL GENEALÓGICO ----|\n";
-	cout << "\n\t----------------------------------\n";
+	cout << "\t----------------------------------\n";
         cout << "\n\t[1]. Insertar miembro\n";
         cout << "\t[2]. Buscar miembro\n";
         cout << "\t[3]. Eliminar miembro\n";
@@ -311,9 +311,9 @@ int main() {
 			        int id, nac;
 			        string nombre, fallecido;
 			
-			        cout << "\tID (DNI): "; cin >> id;
-			        cout << "\tNombre: "; cin >> nombre;
-			        cout << "\tAño de nacimiento: "; cin >> nac;
+			        cout << "\tID (DNI)\t\t: "; cin >> id;
+			        cout << "\tNombre\t\t\t: "; cin >> nombre;
+			        cout << "\tAño de nacimiento\t: "; cin >> nac;
 			        cout << "\tFallecimiento (o 'Vivo'): "; cin >> fallecido;
 			
 			        Nodo* nuevo = crearNodo(id, nombre, nac, fallecido);
@@ -322,7 +322,7 @@ int main() {
 			    } else {
 			        int idRelacionado, relacion;
 			
-			        cout << "\tIngrese el ID del familiar relacionado: ";
+			        cout << "\n\tIngrese el ID del familiar relacionado: ";
 			        cin >> idRelacionado;
 			
 			        Nodo* relativo = buscar(raiz, idRelacionado);
@@ -332,12 +332,12 @@ int main() {
 			        }
 			
 			        cout << "\n\t¿Qué relación tiene con " << relativo->nombre << "?\n";
-			        cout << "\n\t1. Padre/Madre\n";
-			        cout << "\t2. Hijo/a izquierdo/a\n";
-			        cout << "\t3. Hijo/a derecho/a\n";
-			        cout << "\t4. Hermano/a izquierdo/a\n";
-			        cout << "\t5. Hermano/a derecho/a\n";
-			        cout << "Opción: ";
+			        cout << "\n\t1 -> Padre/Madre\n";
+			        cout << "\t2 -> Hijo/a izquierdo/a\n";
+			        cout << "\t3 -> Hijo/a derecho/a\n";
+			        cout << "\t4 -> Hermano/a izquierdo/a\n";
+			        cout << "\t5 -> Hermano/a derecho/a\n";
+			        cout << "\n\tDigite un número de opción: ";
 			        cin >> relacion;
 			
 			        // Verifica si excede generaciones antes de pedir datos
@@ -345,7 +345,7 @@ int main() {
 					if ((relacion == 1 && nivelActual >= generaciones) || // Insertar padre sube una generación
 					    ((relacion == 2 || relacion == 3) && nivelActual + 1 > generaciones) || // Insertar hijo sí sube
 					    ((relacion == 4 || relacion == 5) && nivelActual > generaciones)) { // Hermano está al mismo nivel
-					    cout << "No se puede insertar: excede las generaciones permitidas.\n";
+					    cout << "\tNo se puede insertar: excede las generaciones permitidas.\n";
 					    break;
 					}
 			
@@ -353,12 +353,16 @@ int main() {
 			        int id, nac;
 			        string nombre, fallecido;
 			
-			        cout << "\tID (DNI): "; cin >> id;
-			        cout << "\tNombre: "; cin >> nombre;
-			        cout << "\tAño de nacimiento: "; cin >> nac;
+			        cout << "\tID (DNI)\t\t: "; cin >> id;
+			        cout << "\tNombre\t\t\t: "; cin >> nombre;
+			        cout << "\tAño de nacimiento\t: "; cin >> nac;
 			        cout << "\tFallecimiento (o 'Vivo'): "; cin >> fallecido;
 			
 			        Nodo* nuevo = crearNodo(id, nombre, nac, fallecido);
+				if (!validaranio(nuevo, relativo, relacion)) {
+    					cout << "\tNo se puede insertar: años de nacimiento INCOHERENTES para la relación indicada.\n";
+    					break;
+				}
 			        insertarFlexible(raiz, nuevo, generaciones, idRelacionado, relacion);
 			    }
 			    break;
@@ -366,7 +370,7 @@ int main() {
 
             case 2: {
                 int id;
-                cout << "\tIngrese ID a buscar: ";
+                cout << "\n\tIngrese ID a buscar: ";
                 cin >> id;
                 Nodo* resultado = buscar(raiz, id);
                 if (resultado)
@@ -384,7 +388,6 @@ int main() {
 	        break;
 	    }
 
-
             case 4: {
                 int id;
                 cout << "\tID para ver ancestros: ";
@@ -401,20 +404,28 @@ int main() {
                 cin >> id;
                 Nodo* n = buscar(raiz, id);
                 if (n) mostrarDescendientes(n);
-                else cout << "No encontrado.\n";
+                else cout << "\tNo encontrado.\n";
                 break;
             }
 
             case 6: {
                 int tipo;
-                cout << "\t1. Inorden\n2. Preorden\n3. Postorden\n4. Por niveles\nOpción: ";
+                cout << "\n\t1. Inorden\n\t2. Preorden\n\t3. Postorden\n\t4. Por niveles\n\n\tOpción: ";
                 cin >> tipo;
                 switch (tipo) {
-                    case 1: inorden(raiz); break;
-                    case 2: preorden(raiz); break;
-                    case 3: postorden(raiz); break;
-                    case 4: porNiveles(raiz); break;
-                    default: cout << "Opción no válida.\n"; break;
+                    case 1:
+			cout << "\n\t========= RECORRIDO EN INORDEN =========\n";
+			inorden(raiz); break;
+                    case 2:
+                    	cout << "\n\t========= RECORRIDO EN PREORDEN =========\n";
+			preorden(raiz); break;
+                    case 3:
+                    	cout << "\n\t========= RECORRIDO EN POSTORDEN =========\n";
+			postorden(raiz); break;
+                    case 4:
+                    	cout << "\n\t========= RECORRIDO POR NIVELES =========\n";
+			porNiveles(raiz); break;
+                    default: cout << "\n\tOpción no válida.\n"; break;
                 }
                 break;
             }
