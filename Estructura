@@ -155,27 +155,36 @@ void eliminarMiembroGenealogico(Nodo*& raiz, int id) {
     cout << "Miembro eliminado correctamente (con reorganización).\n";
 }
 
+//imprimir recorrido con datos completos
+void imprimirFicha(Nodo* nodo, const string& tipo) {
+    cout << "\t----------------------------------\n";
+    cout << "\tTipo        : " << tipo << "\n";
+    cout << "\tNombre    : " << nodo->nombre << "\n";
+    cout << "\tID (DNI)  : " << nodo->id << "\n";
+    cout << "\tNacimiento: " << nodo->nacimiento << "\n";
+    cout << "\tFallecido : " << nodo->fallecimiento << "\n";
+}
 
 // Recorridos
-void inorden(Nodo* nodo) {
+void inorden(Nodo* nodo, string tipo = "RAIZ") {
     if (!nodo) return;
-    inorden(nodo->izq);
-    cout << nodo->nombre << " (" << nodo->id << ")\n";
-    inorden(nodo->der);
+    inorden(nodo->izq, "Hijo Izquierdo");
+    imprimirFicha(nodo, tipo);
+    inorden(nodo->der, "Hijo Derecho");
 }
 
-void preorden(Nodo* nodo) {
+void preorden(Nodo* nodo, string tipo = "RAÍZ") {
     if (!nodo) return;
-    cout << nodo->nombre << " (" << nodo->id << ")\n";
-    preorden(nodo->izq);
-    preorden(nodo->der);
+    imprimirFicha(nodo, tipo);
+    preorden(nodo->izq, "Hijo Izquierdo");
+    preorden(nodo->der, "Hijo Derecho");
 }
 
-void postorden(Nodo* nodo) {
+void postorden(Nodo* nodo, string tipo = "RAÍZ") {
     if (!nodo) return;
-    postorden(nodo->izq);
-    postorden(nodo->der);
-    cout << nodo->nombre << " (" << nodo->id << ")\n";
+    postorden(nodo->izq, "Hijo Izquierdo");
+    postorden(nodo->der, "Hijo Derecho");
+    imprimirFicha(nodo, tipo);
 }
 
 void porNiveles(Nodo* raiz) {
@@ -191,7 +200,7 @@ void porNiveles(Nodo* raiz) {
     while (inicio < fin) {
         Nodo* actual = cola[inicio++]; // Desencolar
 
-        cout << actual->nombre << " (" << actual->id << ")\n";
+        imprimirFicha(actual, "Pariente");
 
         // Encolar hijos
         if (actual->izq != NULL) {
@@ -235,6 +244,45 @@ int calcularProfundidad(Nodo* nodo, int nivel) {
     return (izq > der) ? izq : der;
 }
 
+bool validaranio(Nodo* nuevo, Nodo* relativo, int relacion){
+	int diferencia;
+
+    switch (relacion) {
+        case 1: { // Padre / madre
+            diferencia = relativo->nacimiento - nuevo->nacimiento;
+            if (diferencia < 12) { //si la diferencia de la edad del hijo(relativo) - la edad de la raiz(nuevo) es menor a 12...
+                cout << "\tError: Es muy joven para ser padre/madre de " << relativo->nombre << ".\n";
+                return false;
+            }
+            return true; //continua y valida la edad en caso de que el padre si sea mayor o igual a 12 años
+        }
+		//si la edad del nuevo ingresante - el del relativo es menor a 12 también decimos que al diferencia de edad no es valida
+        case 2: // Hijo izquierdo
+        case 3: { // Hijo derecho
+            diferencia = nuevo->nacimiento - relativo->nacimiento;
+            if (diferencia < 12) {
+                cout << "\n\tError: muy poca diferencia de edad para ser hijo/a de " << relativo->nombre << ".\n";
+                return false;
+            }
+            return true; //si la edad es valida continuamos
+        }
+		//la diferencia de edad entre el nuevo miembro y la Raiz es mayor a 40
+        case 4: // Hermano izquierdo
+        case 5: { // Hermano derecho
+            diferencia = nuevo->nacimiento - relativo->nacimiento;
+            if (diferencia > 40) { //decimos que hay un error ya que no siempre la edad es tan diferente
+                cout << "\n\tError: demasiada diferencia de edad para ser hermanos.\n";
+                return false;
+            }
+            return true; //si está dentro del rango etonces continuamos
+        }
+
+        default: //si no cumple ninguno de esos casos decimos que no es válida la relación
+            cout << "\tRelación no válida.\n";
+            return false;
+    }
+}
+
 // Menú principal
 int main() {
     setlocale(LC_CTYPE, "Spanish");
@@ -244,15 +292,17 @@ int main() {
 
     int opcion;
     do {
-        cout << "\n\t---- MENU ÁRBOL GENEALÓGICO ----\n";
-        cout << "\t[1]. Insertar miembro\n";
+	cout << "\n\t----------------------------------\n";
+        cout << "\t|---- MENU ÁRBOL GENEALÓGICO ----|\n";
+	cout << "\n\t----------------------------------\n";
+        cout << "\n\t[1]. Insertar miembro\n";
         cout << "\t[2]. Buscar miembro\n";
         cout << "\t[3]. Eliminar miembro\n";
         cout << "\t[4]. Consultar ancestros\n";
         cout << "\t[5]. Consultar descendientes\n";
         cout << "\t[6]. Recorridos\n";
         cout << "\t[7]. Salir\n";
-        cout << "\tSeleccione una opción: ";
+        cout << "\n\tSeleccione una opción: ";
         cin >> opcion;
 
         switch (opcion) {
