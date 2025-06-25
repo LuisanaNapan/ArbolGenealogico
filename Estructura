@@ -30,6 +30,16 @@ Nodo* buscar(Nodo* actual, int id) {
     if (actual == NULL || actual->id == id) return actual;
     return (id < actual->id) ? buscar(actual->izq, id) : buscar(actual->der, id);
 }
+//Buscar Mienbro por nombre
+Nodo* buscarPorNombre(Nodo* nodo, string nombre) {
+    if (!nodo) return NULL;
+    if (nodo->nombre == nombre) return nodo;
+
+    Nodo* izq = buscarPorNombre(nodo->izq, nombre);
+    if (izq) return izq;
+
+    return buscarPorNombre(nodo->der, nombre);
+}
 
 // Insertar miembro
 void insertarFlexible(Nodo*& raiz, Nodo* nuevo, int generacionesMax, int idRelacionado, int relacion) { //NO CAMBIAR - DAYANA
@@ -213,19 +223,47 @@ void porNiveles(Nodo* raiz) {
 }
 
 // Ancestros
-void mostrarAncestros(Nodo* nodo) {
-    while (nodo) {
-        cout << nodo->nombre << " (" << nodo->id << ")\n";
-        nodo = nodo->padre;
+void mostrarAncestros(Nodo* ancestro, Nodo* hijoOriginal) {
+    if (ancestro == NULL) {
+        cout << "\n\tEste nodo no tiene ancestros registrados.\n";
+        return;
+    }
+
+    int nivel = 1;
+    while (ancestro) {
+        cout << "\n\tNivel " << nivel << " - Ancestro:\n";
+        imprimirFicha(ancestro, "Ancestro");
+
+        int diferencia = (hijoOriginal->nacimiento > ancestro->nacimiento) 
+                    ? (hijoOriginal->nacimiento - ancestro->nacimiento) 
+                    : (ancestro->nacimiento - hijoOriginal->nacimiento);
+        cout << "\tDiferencia de nacimiento con respecto a " << hijoOriginal->nombre
+             << ": " << diferencia << " años\n";
+
+        ancestro = ancestro->padre;
+        nivel++;
     }
 }
 
 // Descendientes (en preorden)
 void mostrarDescendientes(Nodo* nodo) {
     if (!nodo) return;
-    cout << nodo->nombre << " (" << nodo->id << ")\n";
-    mostrarDescendientes(nodo->izq);
-    mostrarDescendientes(nodo->der);
+
+    // Verificamos si el nodo no tiene hijos
+    if (nodo->izq == NULL && nodo->der == NULL) {
+        cout << "\n\tEste nodo no tiene hijos (hojas).\n";
+        return;
+    }
+
+    // Si tiene hijos, los mostramos con sus respectivos recorridos
+    if (nodo->izq) {
+        imprimirFicha(nodo->izq, "Descendiente (izquierdo)");
+        mostrarDescendientes(nodo->izq);
+    }
+    if (nodo->der) {
+        imprimirFicha(nodo->der, "Descendiente (derecho)");
+        mostrarDescendientes(nodo->der);
+    }
 }
 
 int calcularNivel(Nodo* nodo) {
@@ -389,22 +427,66 @@ int main() {
 	    }
 
             case 4: {
-                int id;
-                cout << "\tID para ver ancestros: ";
-                cin >> id;
-                Nodo* n = buscar(raiz, id);
-                if (n) mostrarAncestros(n->padre);
-                else cout << "No encontrado.\n";
+                int tipoBusqueda;
+                cout << "\n\t¿Cómo desea buscar al miembro?\n";
+                cout << "\t[1] Por ID\n";
+                cout << "\t[2] Por nombre\n";
+                cout << "\tSeleccione una opción: ";
+                cin >> tipoBusqueda;
+
+                Nodo* n = NULL;
+                if (tipoBusqueda == 1) {
+                    int id;
+                    cout << "\tIngrese ID para ver ancestros: ";
+                    cin >> id;
+                    n = buscar(raiz, id);
+                } else if (tipoBusqueda == 2) {
+                    string nombre;
+                    cout << "\tIngrese nombre exacto para ver ancestros: ";
+                    cin >> nombre;
+                    n = buscarPorNombre(raiz, nombre);
+                } else {
+                    cout << "\tOpción inválida.\n";
+                    break;
+                }
+
+                if (n)
+                     mostrarAncestros(n->padre, n);
+                else
+                    cout << "\tMiembro no encontrado.\n";
+
                 break;
             }
 
             case 5: {
-                int id;
-                cout << "\tID para ver descendientes: ";
-                cin >> id;
-                Nodo* n = buscar(raiz, id);
-                if (n) mostrarDescendientes(n);
-                else cout << "\tNo encontrado.\n";
+                int tipoBusqueda;
+                cout << "\n\t¿Cómo desea buscar al miembro?\n";
+                cout << "\t[1] Por ID\n";
+                cout << "\t[2] Por nombre\n";
+                cout << "\tSeleccione una opción: ";
+                cin >> tipoBusqueda;
+
+                Nodo* n = NULL;
+                if (tipoBusqueda == 1) {
+                    int id;
+                    cout << "\tIngrese ID para ver descendientes: ";
+                    cin >> id;
+                    n = buscar(raiz, id);
+                } else if (tipoBusqueda == 2) {
+                    string nombre;
+                    cout << "\tIngrese nombre exacto para ver descendientes: ";
+                    cin >> nombre;
+                    n = buscarPorNombre(raiz, nombre);
+                } else {
+                    cout << "\tOpción inválida.\n";
+                    break;
+                }
+
+                if (n)
+                    mostrarDescendientes(n);
+                else
+                    cout << "\tMiembro no encontrado.\n";
+
                 break;
             }
 
