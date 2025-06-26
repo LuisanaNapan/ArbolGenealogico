@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <queue> //se usa para implementar el algoritmo de Búsqueda en Anchura (BFS) 
 using namespace std;
 
 struct Nodo {
