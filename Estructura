@@ -488,21 +488,25 @@ void mostrarAncestros(Nodo* ancestro, Nodo* hijoOriginal) {
     }
 }
 
-// Descendientes (en preorden)
+//Descendientes (en preorden)
 void mostrarDescendientes(Nodo* nodo) {
-    if (!nodo) return;
+    
+    if (!nodo) return;// Caso base: si el nodo es nulo, salimos de la función
 
-    // Verificamos si el nodo no tiene hijos
+    // Si el nodo es hoja, mostramos esto
     if (nodo->izq == NULL && nodo->der == NULL) {
         cout << "\n\tEste nodo no tiene hijos (hojas).\n";
         return;
     }
 
-    // Si tiene hijos, los mostramos con sus respectivos recorridos
+    // Si tiene hijo izquierdo, mostramos su información
+    // y llamamos recursivamente para buscar más descendientes desde allí
     if (nodo->izq) {
         imprimirFicha(nodo->izq, "Descendiente (izquierdo)");
         mostrarDescendientes(nodo->izq);
     }
+
+    // Si tiene hijo derecho, lo mostramos e iniciamos recorrido desde ese hijo
     if (nodo->der) {
         imprimirFicha(nodo->der, "Descendiente (derecho)");
         mostrarDescendientes(nodo->der);
