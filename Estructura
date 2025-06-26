@@ -27,18 +27,38 @@ Nodo* crearNodo(int id, string nombre, int nacimiento, string estado) {
     return nuevo;
 }
 
+// Buscar miembro por ID
+Nodo* buscar(Nodo* actual, int id) {
+    if (actual == NULL || actual->id == id) return actual;
+    return (id < actual->id) ? buscar(actual->izq, id) : buscar(actual->der, id);
+}
+
+//si el ID existe, primero buscamos el id
+bool idExiste(int id) {
+    return buscar(raiz, id) != NULL;
+}
+
+//validamos el ID
+void pedirID(int& id) {
+    do {
+        cout << "\n\tID (DNI de 8 dígitos)\t: ";
+        cin >> id;
+        if (id < 10000000 || id > 99999999)
+            cout << "\tERROR: El DNI debe tener 8 dígitos.\n";
+        else if (idExiste(id))
+            cout << "\tERROR: Ya existe un miembro con ese ID.\n";
+        else
+            break;
+    } while (true);
+}
+
 //Solicita y valida los datos de un nuevo miembro
 Nodo* solicitarDatosMiembro() {
     int id, nacimiento;
     string nombre, estado;
     bool estadoValido=false; //Bandera para validar el estado de vida
 
-    do {
-        cout << "\tID (DNI de 8 dígitos)\t: ";
-        cin >> id;
-        if (id < 10000000 || id > 99999999)
-            cout << "\tERROR: El DNI debe tener 8 dígitos.\n";
-    } while (id < 10000000 || id > 99999999);
+    pedirID(id); //llamamos a nuestra funcion de pedirID llamando tambien idExiste
 
     cout << "\tNombre\t\t\t: ";
     cin >> nombre;
@@ -83,11 +103,6 @@ int calcularProfundidad(Nodo* nodo, int nivel) {
     return (izq > der) ? izq : der;
 }
 
-// Buscar miembro por ID
-Nodo* buscar(Nodo* actual, int id) {
-    if (actual == NULL || actual->id == id) return actual;
-    return (id < actual->id) ? buscar(actual->izq, id) : buscar(actual->der, id);
-}
 //Buscar Mienbro por nombre
 Nodo* buscarPorNombre(Nodo* nodo, string nombre) {
     if (!nodo) return NULL;
