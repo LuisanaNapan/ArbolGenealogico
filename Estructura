@@ -103,15 +103,15 @@ int calcularProfundidad(Nodo* nodo, int nivel) {
     return (izq > der) ? izq : der;
 }
 
-//Buscar Mienbro por nombre
+// Buscar Miembro por nombre
 Nodo* buscarPorNombre(Nodo* nodo, string nombre) {
-    if (!nodo) return NULL;
-    if (nodo->nombre == nombre) return nodo;
+    if (!nodo) return NULL;// Caso base: si el nodo actual es NULL, el nombre no está aquí
+    if (nodo->nombre == nombre) return nodo;// Si el nombre del nodo actual coincide con el buscado, lo devolvemos
 
-    Nodo* izq = buscarPorNombre(nodo->izq, nombre);
-    if (izq) return izq;
-
-    return buscarPorNombre(nodo->der, nombre);
+    Nodo* izq = buscarPorNombre(nodo->izq, nombre);// Buscamos recursivamente en el subárbol izquierdo
+    if (izq) return izq;// Si lo encontramos en el lado izquierdo, lo devolvemos
+    
+    return buscarPorNombre(nodo->der, nombre);// Si no lo encontramos en el izquierdo, buscamos en el derecho
 }
 
 bool validaranio(Nodo* nuevo, Nodo* relativo, int relacion){
