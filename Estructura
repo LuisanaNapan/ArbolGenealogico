@@ -297,49 +297,86 @@ Nodo* minimo(Nodo* actual) {
         actual = actual->izq;
     return actual;
 }
+//ELIMINAR 
+void eliminarMiembro(Nodo*& nodo, int id) {
+    if (nodo == NULL) return;  // Si el nodo es nulo, no hay nada que eliminar
 
-void eliminarMiembroGenealogico(Nodo*& raiz, int id) {
-    Nodo* actual = buscar(raiz, id); // 1. Buscar al miembro a eliminar por su ID
-    if (!actual) {
-        cout << "Miembro no encontrado.\n"; // 2. Si no lo encuentra, muestra mensaje
-        return;
-    }
+    // Recorrer primero el subárbol izquierdo y derecho (postorden)
+    eliminarMiembro(nodo->izq, id);  // Eliminar en subárbol izquierdo
+    eliminarMiembro(nodo->der, id);  // Eliminar en subárbol derecho
 
-    Nodo* padre = actual->padre; // 3. Guardamos al padre del nodo a eliminar (si tiene)
+    // Procesar el nodo actual si su id coincide con el id a eliminar
+    if (nodo->id == id) {
 
-    // 4. Si tiene un padre (NO es la raíz)
-    if (padre) {
-        if (padre->izq == actual) { // 5. ¿Es hijo izquierdo?
-            // 6. Asignamos el hijo izquierdo del eliminado como nuevo hijo del padre
-            padre->izq = actual->izq ? actual->izq : actual->der;
-            if (padre->izq) padre->izq->padre = padre;
-        } else if (padre->der == actual) { // 7. ¿Es hijo derecho?
-            padre->der = actual->izq ? actual->izq : actual->der;
-            if (padre->der) padre->der->padre = padre;
+        // Caso 1: Nodo hoja (sin hijos)
+        if (nodo->izq == NULL && nodo->der == NULL) {
+            cout << "Se eliminó un nodo hoja (sin hijos): " << nodo->nombre << endl;  // Mensaje informativo
+            delete nodo;   // Liberar memoria del nodo
+            nodo = NULL;   // Desconectar el puntero para evitar acceso a memoria liberada
         }
 
-    } else {
-        // 8. Si el nodo a eliminar es la raíz (NO tiene padre)
-        if (actual->izq) {
-            raiz = actual->izq;         // 9. Su hijo izquierdo será la nueva raíz
-            raiz->padre = NULL;
+        // Caso 2: Nodo con solo hijo izquierdo
+        else if (nodo->izq != NULL && nodo->der == NULL) {
+            cout << "Se eliminó un nodo con solo hijo izquierdo: " << nodo->nombre << endl;  // Mensaje
+            Nodo* temp = nodo;      // Guardar puntero temporal al nodo a eliminar
+            nodo = nodo->izq;       // Reemplazar el nodo actual por su hijo izquierdo
+            if (nodo != NULL) nodo->padre = temp->padre;  // Actualizar puntero padre del nuevo nodo
+            delete temp;            // Eliminar el nodo original
+        }
 
-            // 10. Si también hay hijo derecho, lo colocamos como descendiente
-            Nodo* temp = raiz;
-            while (temp->der) temp = temp->der;  // 11. Buscamos la posición más a la derecha
-            temp->der = actual->der;             // 12. Lo colocamos allí
-            if (actual->der) actual->der->padre = temp;
+        // Caso 3: Nodo con solo hijo derecho
+        else if (nodo->izq == NULL && nodo->der != NULL) {
+            cout << "Se eliminó un nodo con solo hijo derecho: " << nodo->nombre << endl;  // Mensaje
+            Nodo* temp = nodo;      // Guardar puntero temporal
+            nodo = nodo->der;       // Reemplazar el nodo actual por su hijo derecho
+            if (nodo != NULL) nodo->padre = temp->padre;  // Actualizar padre
+            delete temp;            // Liberar memoria del nodo original
+        }
 
-        } else if (actual->der) {
-            raiz = actual->der;  // 13. Si no tiene hijo izquierdo, el derecho será la raíz
-            raiz->padre = NULL;
-        } else {
-            raiz = NULL;  // 14. Si no tiene hijos, el árbol queda vacío
+        // Caso 4: Nodo con dos hijos
+        else {
+            cout << "Se eliminó un nodo con dos hijos (reemplazo por subárbol izquierdo): " << nodo->nombre << endl;  // Mensaje
+            Nodo* reemplazo = nodo->izq;  // Buscar nodo máximo en subárbol izquierdo (predecesor)
+            Nodo* padreReemplazo = nodo;  // Puntero para seguir al padre del reemplazo
+            while (reemplazo->der != NULL) {  // Mientras haya hijo derecho
+                padreReemplazo = reemplazo;    // Avanzar padre
+                reemplazo = reemplazo->der;    // Avanzar al hijo derecho
+            }
+            // Copiar datos del nodo reemplazo al nodo actual
+            nodo->id = reemplazo->id;
+            nodo->nombre = reemplazo->nombre;
+            // Eliminar recursivamente el nodo duplicado en subárbol izquierdo
+            eliminarMiembro(nodo->izq, reemplazo->id);
         }
     }
+}
 
-    delete actual;  // 15. Finalmente, eliminamos el nodo
-    cout << "Miembro eliminado correctamente (con reorganización).\n";
+
+//ELIMINAR POR NIVELES
+void eliminarPorNivel(Nodo*& raiz, int nivelObjetivo) {
+    if (raiz == NULL) return;  // Si el árbol está vacío, no hay nada que eliminar
+    
+    // Cola para recorrer el árbol en anchura (BFS), guarda pares <nodo, nivel>
+    queue<pair<Nodo*, int> > cola;  // Nota el espacio entre > >
+    cola.push(make_pair(raiz, 0)); // Insertar la raíz con nivel 0
+
+    while (!cola.empty()) {
+        Nodo* actual = cola.front().first;  // Nodo actual a procesar
+        int nivel = cola.front().second;    // Nivel del nodo actual
+        cola.pop();                         // Sacar el nodo de la cola
+
+        if (actual == NULL) continue;       // Si el nodo es nulo, saltar
+
+        // Encolar hijos con nivel incrementado
+        if (actual->izq != NULL) cola.push(make_pair(actual->izq, nivel + 1));
+        if (actual->der != NULL) cola.push(make_pair(actual->der, nivel + 1));
+
+        // Si el nivel actual es el nivel objetivo, eliminar el nodo
+        if (nivel == nivelObjetivo) {
+            cout << "Eliminando miembro en nivel " << nivel << ": " << actual->nombre << endl;
+            eliminarMiembro(actual, actual->id);  // Llamar a la función para eliminar el nodo específico
+        }
+    }
 }
 
 //imprimir recorrido con datos completos
@@ -478,13 +515,31 @@ int main() {
                 break;
             }
 
-            case 3: {
-		int id;
-		cout << "\tID a eliminar (por fallecimiento): ";
-		cin >> id;
-		eliminarMiembroGenealogico(raiz, id);
-	        break;
-	    }
+	    case 3: {
+                int tipoEliminacion;
+                cout << "\n\tTipo de eliminación:\n";
+                cout << "\t[1] Eliminar por ID\n";
+                cout << "\t[2] Eliminar por nivel\n";
+                cout << "\tSeleccione: ";
+                cin >> tipoEliminacion;
+
+                if (tipoEliminacion == 1) {
+                    int id;
+                    cout << "\tID a eliminar: ";
+                    cin >> id;
+                    eliminarMiembro(raiz, id);
+                } 
+                else if (tipoEliminacion == 2) {
+                    int nivel;
+                    cout << "\tNivel a eliminar: ";
+                    cin >> nivel;
+                    eliminarPorNivel(raiz, nivel);
+                } 
+                else {
+                    cout << "\tOpción inválida\n";
+                }
+                break;
+            }
 
             case 4: {
                 int tipoBusqueda;
