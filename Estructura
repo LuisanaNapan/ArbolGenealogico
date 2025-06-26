@@ -110,7 +110,7 @@ Nodo* buscarPorNombre(Nodo* nodo, string nombre) {
 
     Nodo* izq = buscarPorNombre(nodo->izq, nombre);// Buscamos recursivamente en el subárbol izquierdo
     if (izq) return izq;// Si lo encontramos en el lado izquierdo, lo devolvemos
-    
+
     return buscarPorNombre(nodo->der, nombre);// Si no lo encontramos en el izquierdo, buscamos en el derecho
 }
 
@@ -458,26 +458,33 @@ void porNiveles(Nodo* raiz) {
     }
 }
 
-// Ancestros
+//Ancestros
 void mostrarAncestros(Nodo* ancestro, Nodo* hijoOriginal) {
-    if (ancestro == NULL) {
+    if (ancestro == NULL) {// Si no hay ancestro
         cout << "\n\tEste nodo no tiene ancestros registrados.\n";
         return;
     }
 
-    int nivel = 1;
+    int nivel = 1; // Contador de generaciones ascendentes
+
+    // Recorremos hacia arriba por el árbol mientras existan padres
     while (ancestro) {
+        // Mostramos el nivel generacional y los datos del ancestro actual
         cout << "\n\tNivel " << nivel << " - Ancestro:\n";
         imprimirFicha(ancestro, "Ancestro");
 
+        // Calculamos la diferencia de nacimiento entre el ancestro y el miembro consultado
         int diferencia = (hijoOriginal->nacimiento > ancestro->nacimiento) 
-                    ? (hijoOriginal->nacimiento - ancestro->nacimiento) 
-                    : (ancestro->nacimiento - hijoOriginal->nacimiento);
+                         ? (hijoOriginal->nacimiento - ancestro->nacimiento) 
+                         : (ancestro->nacimiento - hijoOriginal->nacimiento);
+
+        // Mostramos esa diferencia de años
         cout << "\tDiferencia de nacimiento con respecto a " << hijoOriginal->nombre
              << ": " << diferencia << " años\n";
 
+        // Subimos un nivel más arriba en la línea de ancestros
         ancestro = ancestro->padre;
-        nivel++;
+        nivel++; // Aumentamos el nivel generacional
     }
 }
 
